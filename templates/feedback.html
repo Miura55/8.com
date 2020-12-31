@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% block body %}
+<div class="row">
+    <h2 id="displaynamefield"></h2>
+    <form name="form" id="form">
+        <div class="form-group">
+            <label for="comment" class="col-8 control-label">コメント</label>
+            <textarea class="col-8 control-label" rows="5" id="comment"></textarea>
+        </div>
+    </form>
+    <button class="col-md-8 col-md-offset-2 btn btn-primary" id="submit">
+        送信
+    </button>
+</div>
+
+<script>
+    window.onload = function (e) {
+        initLiff("{{ feedbackLiffId }}");
+      };
+    
+    function initLiff(myLiffId) {
+        liff
+            .init({
+                liffId: myLiffId,
+            })
+            .then(() => {
+            if (!liff.isInClient()) {
+                document.getElementById("displaynamefield").textContent = "LINEアプリからご利用ください";
+            } else {
+                // start to use LIFF's api
+                liff
+                .getProfile()
+                .then(function (profile) {
+                    userName = profile.displayName;
+                    document.getElementById("displaynamefield").textContent =
+                    "ご利用ありがとうございます！" + userName + "さん";
+                })
+                .catch(function (error) {
+                    window.alert("Error getting profile: " + error);
+                });
+            }
+            });
+      }
+
+    $("#submit").on("click", function () {
+        boot4.alert(
+            {
+                msg: "ご利用ありがとうございます。またのご利用をお待ちしております",
+                title: "送信完了",
+                callback: function () {
+                    liff.closeWindow();
+                },
+            },
+            "閉じる"
+        );
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends "base.html" %} {% block body %}
+<div class="row">
+    <h2 id="displaynamefield"></h2>
+    <form name="form" id="form">
+        <div class="form-group">
+          <label for="name" class="col-4 control-label">氏名</label>
+          <div class="row justify-content-center">
+            <div class="col-4">
+              <input
+                type="text"
+                class="form-control"
+                id="familyName"
+                placeholder="姓"
+              />
+            </div>
+            <div class="col-4">
+              <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                placeholder="名"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="yomi" class="col-4 control-label">ふりがな</label>
+          <div class="row justify-content-center">
+            <div class="col-4">
+              <input
+                type="text"
+                class="form-control"
+                id="familyNameCap"
+                placeholder="せい"
+              />
+            </div>
+            <div class="col-4">
+              <input
+                type="text"
+                class="form-control"
+                id="firstNameCap"
+                placeholder="めい"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="birthday" class="control-label">生年月日</label>
+          <div class="row justify-content-center">
+            <div class="col-4">
+              <input
+                type="tel"
+                name="year"
+                id="bYear"
+                class="form-control"
+                maxlength="4"
+                placeholder="年"
+              />
+            </div>
+            <div class="col-3">
+              <input
+                type="tel"
+                name="month"
+                id="bMonth"
+                class="form-control"
+                maxlength="2"
+                placeholder="月"
+              />
+            </div>
+            <div class="col-3">
+              <input type="tel" name="day"
+                id="bDay"
+                class="form-control"
+                maxlength="2"
+                placeholder="日"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="job" class="col-4 control-label">職業</label>
+          <select name="job" id="job" class="form-control col-4">
+            <option value>選択してください</option>
+            <option value="公務員">公務員</option>
+            <option value="経営者・役員">経営者・役員</option>
+            <option value="会社員">会社員</option>
+            <option value="自営業">自営業</option>
+            <option value="自由業">自由業</option>
+            <option value="専業主婦">専業主婦</option>
+            <option value="パート・アルバイト">パート・アルバイト</option>
+            <option value="学生">学生</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+
+        <div class="form-group row">
+          <label for="phoneNumber" class="col-4 control-label">電話番号(携帯)</label>
+          <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control col-4"/>
+        </div>
+    </form>
+    <button class="col-md-8 col-md-offset-2 btn btn-primary" id="submit">
+        登録
+    </button>
+</div>
+
+<script>
+    window.onload = function (e) {
+        initLiff("{{ registLiffId }}");
+      };
+    
+    function initLiff(myLiffId) {
+        liff
+            .init({
+                liffId: myLiffId,
+            })
+            .then(() => {
+            if (!liff.isInClient()) {
+                document.getElementById("displaynamefield").textContent = "LINEアプリからご利用ください";
+            } else {
+                // start to use LIFF's api
+                liff
+                .getProfile()
+                .then(function (profile) {
+                    userName = profile.displayName;
+                    document.getElementById("displaynamefield").textContent =
+                    "ようこそ" + userName + "さん";
+                })
+                .catch(function (error) {
+                    window.alert("Error getting profile: " + error);
+                });
+            }
+            });
+      }
+
+      $("#submit").on("click", function () {
+        var params = {
+          token: liff.getIDToken(),
+        };
+        axios
+          .post("/submit", params)
+          .then(function (response) {
+            boot4.alert(
+              {
+                msg: "ご登録ありがとうございます。8.comをお楽しみください",
+                title: "登録完了",
+                callback: function () {
+                  liff.closeWindow();
+                },
+              },
+              "閉じる"
+            );
+          })
+          .catch(function (error) {
+            alert("Debug: " + error);
+          });
+      });
+</script>
+{% endblock %}
